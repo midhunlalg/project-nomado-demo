@@ -1,11 +1,12 @@
-import { Globe, Building2, Plus, Sparkles, Activity as PulseIcon } from 'lucide-react';
+import { Globe, Building2, Plus, Sparkles, Activity as PulseIcon, Ticket, Lock } from 'lucide-react';
 
 interface HeaderProps {
   selectedCity: string;
   onSelectCity: (city: string) => void;
-  activeMode: 'explorer' | 'partner';
-  onToggleMode: (mode: 'explorer' | 'partner') => void;
+  activeMode: 'explorer' | 'partner' | 'owner';
+  onToggleMode: (mode: 'explorer' | 'partner' | 'owner') => void;
   onOpenCreateSpace: () => void;
+  onOpenMyBookings: () => void;
   apiConnected: boolean;
   apiStatus: string;
 }
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeMode,
   onToggleMode,
   onOpenCreateSpace,
+  onOpenMyBookings,
   apiConnected,
   apiStatus
 }) => {
@@ -88,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center bg-[#F2EFE9] p-1.5 rounded-full border border-[#E7E5DF]">
             <button
               onClick={() => onToggleMode('explorer')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 activeMode === 'explorer'
                   ? 'bg-white text-stone-900 shadow-2xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -98,8 +100,19 @@ export const Header: React.FC<HeaderProps> = ({
               <span>Explore</span>
             </button>
             <button
+              onClick={() => onToggleMode('owner')}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                activeMode === 'owner'
+                  ? 'bg-[#1B3B36] text-white shadow-2xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Space Owners</span>
+            </button>
+            <button
               onClick={() => onToggleMode('partner')}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 activeMode === 'partner'
                   ? 'bg-[#1B3B36] text-white shadow-2xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -110,10 +123,20 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
+          {/* My Bookings Button */}
+          <button
+            onClick={onOpenMyBookings}
+            className="btn-outsite-outline text-xs px-3.5 py-2 font-semibold shadow-2xs flex items-center gap-1.5"
+            title="View your booked passes from anywhere"
+          >
+            <Ticket className="w-3.5 h-3.5 text-[#1B3B36]" />
+            <span className="hidden sm:inline">My Bookings</span>
+          </button>
+
           {/* Add Space Button */}
           <button
             onClick={onOpenCreateSpace}
-            className="btn-forest text-xs sm:text-sm px-5 py-2.5 font-semibold shadow-xs"
+            className="btn-forest text-xs px-4 py-2 font-semibold shadow-xs"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span className="hidden sm:inline">List Space</span>

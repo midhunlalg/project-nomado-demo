@@ -7,14 +7,19 @@ import type {
   Partner,
   PartnerWorkspaceSummary,
   RegisterPartnerPayload,
-  NaturalLanguageSearchResult
+  NaturalLanguageSearchResult,
+  Booking,
+  CreateBookingPayload,
+  SpaceOwnerLoginResponse
 } from '../types';
 import {
   MOCK_SPACES,
   MOCK_ROOMS,
   MOCK_ACTIVITIES,
   MOCK_WORKATIONS,
-  MOCK_PARTNERS
+  MOCK_PARTNERS,
+  MOCK_BOOKINGS,
+  MOCK_SPACE_OWNER_CREDENTIALS
 } from './mockData';
 
 const BASE_URL = '/api/v1';
@@ -350,5 +355,146 @@ export const api = {
     };
     MOCK_PARTNERS.push(newPartner);
     return newPartner;
+  },
+
+  // Bookings API
+  async createBooking(payload: CreateBookingPayload): Promise<Booking> {
+    try {
+      const res = await fetch(`${BASE_URL}/bookings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(6000)
+      });
+      if (res.ok) {
+        const created = await res.json();
+        MOCK_BOOKINGS.unshift(created);
+        return created;
+      }
+    } catch (err) {
+      console.warn('createBooking API call failed, saving to mock storage:', err);
+    }
+
+    // Local fallback creation
+    const space = MOCK_SPACES.find(s => s.id === payload.spaceId);
+    const spaceName = payload.spaceName || space?.name || 'Kerala Workspace';
+    const city = space?.city || 'Kerala';
+    const basePrice = payload.tier === 'HOURLY' ? 80 : payload.tier === 'MONTHLY' ? 6500 : 450;
+    const premiumFee = payload.isPremium ? (payload.tier === 'HOURLY' ? 30 : payload.tier === 'MONTHLY' ? 1200 : 150) : 0;
+    const bookingId = `BK-${city.substring(0, 4).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const newBooking: Booking = {
+      id: bookingId,
+      spaceId: payload.spaceId,
+      spaceName,
+      city,
+      guestName: payload.guestName,
+      guestEmail: payload.guestEmail,
+      bookingDate: payload.bookingDate,
+      tier: payload.tier,
+      isPremium: payload.isPremium,
+      premiumSeatType: payload.isPremium ? (payload.premiumSeatType || 'Scenic Premium View Seat') : '',
+      basePrice,
+      premiumFee,
+      totalPrice: basePrice + premiumFee,
+      currency: 'INR',
+      status: 'Confirmed',
+      notes: payload.notes || '',
+      createdAt: new Date().toISOString()
+    };
+    MOCK_BOOKINGS.unshift(newBooking);
+    return newBooking;
+  },
+
+  async getBookings(email?: string, spaceId?: string): Promise<Booking[]> {
+    try {
+      const params = new URLSearchParams();
+      if (email) params.append('email', email);
+      if (spaceId) params.append('spaceId', spaceId);
+      const url = params.toString() ? `${BASE_URL}/bookings?${params.toString()}` : `${BASE_URL}/bookings`;
+
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err) {
+      console.warn('getBookings API call failed, using mock data:', err);
+    }
+
+    if (email) {
+      return MOCK_BOOKINGS.filter(b => b.guestEmail.toLowerCase() === email.toLowerCase());
+    }
+    if (spaceId) {
+      return MOCK_BOOKINGS.filter(b => b.spaceId.toLowerCase() === spaceId.toLowerCase());
+    }
+    return MOCK_BOOKINGS;
+  },
+
+  async getBookingById(id: string): Promise<Booking | null> {
+    try {
+      const res = await fetch(`${BASE_URL}/bookings/${encodeURIComponent(id)}`, { signal: AbortSignal.timeout(4000) });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err) {
+      console.warn('getBookingById API call failed:', err);
+    }
+    return MOCK_BOOKINGS.find(b => b.id.toLowerCase() === id.toLowerCase()) || null;
+  },
+
+  async ownerLogin(username: string, password: string): Promise<SpaceOwnerLoginResponse> {
+    try {
+      const res = await fetch(`${BASE_URL}/bookings/owner/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        signal: AbortSignal.timeout(6000)
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+      if (res.status === 401) {
+        const data = await res.json();
+        return data;
+      }
+    } catch (err) {
+      console.warn('ownerLogin API call failed, authenticating with mock data:', err);
+    }
+
+    // Mock fallback login
+    const cred = MOCK_SPACE_OWNER_CREDENTIALS.find(
+      c => c.username.toLowerCase() === username.trim().toLowerCase() && c.password === password
+    );
+    if (!cred) {
+      return { success: false, message: 'Invalid space owner username or password.' };
+    }
+
+    const spaceBookings = MOCK_BOOKINGS.filter(b => b.spaceId === cred.spaceId);
+    return {
+      success: true,
+      message: `Welcome back, ${cred.ownerName}! Showing live bookings for ${cred.spaceName}.`,
+      owner: {
+        spaceId: cred.spaceId,
+        spaceName: cred.spaceName,
+        city: cred.city,
+        username: cred.username,
+        ownerName: cred.ownerName,
+        email: cred.email,
+        phone: cred.phone
+      },
+      bookings: spaceBookings
+    };
+  },
+
+  async getOwnerCredentials(): Promise<any[]> {
+    try {
+      const res = await fetch(`${BASE_URL}/bookings/owner/credentials`, { signal: AbortSignal.timeout(4000) });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // fallback
+    }
+    return MOCK_SPACE_OWNER_CREDENTIALS;
   }
 };

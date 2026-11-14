@@ -24,15 +24,16 @@ import {
   Tv,
   ArrowRight
 } from 'lucide-react';
-import type { CoworkingSpace, Activity, MeetingRoom } from '../types';
+import type { CoworkingSpace, Activity, MeetingRoom, Booking } from '../types';
 import { getTransitInfoForSpace, getProximityHighlights } from '../services/transitData';
+import { api } from '../services/api';
 
 interface SpaceDetailPageProps {
   space: CoworkingSpace;
   activities: Activity[];
   rooms: MeetingRoom[];
   onBack: () => void;
-  onBookPass: (spaceName: string, date: string, tier: string) => void;
+  onBookPass: (spaceName: string, date: string, tier: string, isPremium?: boolean, premiumSeatType?: string) => void;
   onActivityRsvp: (activity: Activity) => void;
   onReserveRoom?: (room: MeetingRoom) => void;
 }
@@ -51,6 +52,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
+  const [isPremium, setIsPremium] = useState(false);
+  const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
@@ -83,14 +86,57 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       ? hourlyPrice
       : monthlyPrice;
 
-  const handleBookingSubmit = (e: React.FormEvent) => {
+  const getPremiumSeatView = (sp: CoworkingSpace) => {
+    const text = `${sp.name} ${sp.city} ${sp.description}`.toLowerCase();
+    if (text.includes('varkala') || text.includes('cliff') || text.includes('sea') || text.includes('ocean')) {
+      return '🌊 Sea-Facing Cliffside Window Seat';
+    }
+    if (text.includes('munnar') || text.includes('tea') || text.includes('mountain') || text.includes('cloud')) {
+      return '🍃 Tea Plantation Panoramic View Seat';
+    }
+    if (text.includes('alleppey') || text.includes('water') || text.includes('backwater')) {
+      return '🛶 Backwater Canal & Houseboat View Seat';
+    }
+    if (text.includes('wayanad') || text.includes('coffee') || text.includes('rainforest')) {
+      return '☕ Coffee Plantation Canopy View Seat';
+    }
+    if (text.includes('fort kochi') || text.includes('heritage') || text.includes('courtyard')) {
+      return '🌿 Rain-Tree Courtyard Balcony Seat';
+    }
+    if (text.includes('kakkanad') || text.includes('tech') || text.includes('infopark')) {
+      return '🏙️ Skyline Tech High-Floor View Seat';
+    }
+    return '✦ Scenic Premium View Seat';
+  };
+
+  const premiumSeatView = getPremiumSeatView(space);
+  const premiumFee = isPremium
+    ? (selectedTier === 'hourly' ? 30 : selectedTier === 'monthly' ? 1200 : 150)
+    : 0;
+  const totalDue = currentPrice + premiumFee;
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const booking = await api.createBooking({
+        spaceId: space.id,
+        spaceName: space.name,
+        guestName,
+        guestEmail,
+        bookingDate: selectedDate,
+        tier: selectedTier.toUpperCase() as 'DAILY' | 'HOURLY' | 'MONTHLY',
+        isPremium,
+        premiumSeatType: isPremium ? premiumSeatView : undefined
+      });
+      setConfirmedBooking(booking);
       setBookingConfirmed(true);
-      onBookPass(space.name, selectedDate, selectedTier.toUpperCase());
-    }, 600);
+      onBookPass(space.name, selectedDate, selectedTier.toUpperCase(), isPremium, premiumSeatView);
+    } catch (err) {
+      console.error('Booking failed:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopyAddress = () => {
@@ -895,11 +941,23 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                     <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-3">
                       <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
                     </div>
+                    <div className="inline-block px-3 py-1 rounded-full bg-emerald-100/70 text-emerald-900 text-[11px] font-bold tracking-wider uppercase mb-1.5">
+                      Ref: {confirmedBooking?.id || 'CONFIRMED'}
+                    </div>
                     <h4 className="font-editorial text-xl font-normal text-emerald-950">
                       Digital Pass Confirmed!
                     </h4>
                     <p className="text-xs sm:text-sm text-emerald-800 mt-1.5">
-                      Your {selectedTier.toUpperCase()} pass for <strong>{space.name}</strong> on <strong>{selectedDate}</strong> is ready.
+                      Your {selectedTier.toUpperCase()} pass for <strong>{space.name}</strong> on <strong>{selectedDate}</strong> is saved to Azure Cloud.
+                    </p>
+                    {isPremium && (
+                      <div className="mt-3 p-2.5 rounded-xl bg-amber-100/60 border border-amber-300 text-amber-900 text-xs font-semibold flex items-center justify-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-amber-700" />
+                        <span>Premium Seat: {confirmedBooking?.premiumSeatType || premiumSeatView}</span>
+                      </div>
+                    )}
+                    <p className="text-[11px] text-emerald-700 mt-2">
+                      You can view this booking anytime from any device using your email.
                     </p>
                     <button
                       onClick={() => setBookingConfirmed(false)}
@@ -952,12 +1010,47 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                       />
                     </div>
 
+                    {/* Premium Seat Checkbox */}
+                    <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/90 transition-all hover:border-amber-300">
+                      <label className="flex items-start gap-3 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={isPremium}
+                          onChange={(e) => setIsPremium(e.target.checked)}
+                          className="mt-1 w-4 h-4 text-[#1B3B36] rounded border-stone-300 focus:ring-[#1B3B36] cursor-pointer"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                              <span>Premium Seat</span>
+                              <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-semibold">
+                                {premiumSeatView}
+                              </span>
+                            </span>
+                            <span className="text-xs font-bold text-[#1B3B36]">
+                              +₹{selectedTier === 'hourly' ? '30' : selectedTier === 'monthly' ? '1,200' : '150'}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
+                            Guaranteed window view desk ({premiumSeatView}) with dedicated power supply and filter coffee bar access.
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+
                     {/* Price Breakdown */}
                     <div className="pt-3 border-t border-stone-100 space-y-1.5 text-xs text-stone-500">
                       <div className="flex justify-between">
                         <span>Workspace Desk ({selectedTier})</span>
                         <span className="font-semibold text-stone-800">₹{currentPrice.toLocaleString()}</span>
                       </div>
+                      {isPremium && (
+                        <div className="flex justify-between text-amber-900 font-semibold">
+                          <span className="flex items-center gap-1">✦ Premium Seat ({premiumSeatView})</span>
+                          <span>+₹{premiumFee.toLocaleString()}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between">
                         <span>Fiber Wifi SLA & Filter Coffee</span>
                         <span className="text-emerald-700 font-medium">Included</span>
@@ -968,7 +1061,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                       </div>
                       <div className="flex justify-between pt-2 border-t border-stone-200 text-sm font-bold text-stone-900">
                         <span>Total Due</span>
-                        <span>₹{currentPrice.toLocaleString()}</span>
+                        <span>₹{totalDue.toLocaleString()}</span>
                       </div>
                     </div>
 

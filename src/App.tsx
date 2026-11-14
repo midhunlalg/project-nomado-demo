@@ -26,6 +26,8 @@ import { ActivityCard } from './components/ActivityCard';
 import { WorkationCard } from './components/WorkationCard';
 import { WorkationModal } from './components/WorkationModal';
 import { PartnerPortal } from './components/PartnerPortal';
+import { SpaceOwnerPortal } from './components/SpaceOwnerPortal';
+import { MyBookingsModal } from './components/MyBookingsModal';
 import { CreateSpaceModal } from './components/CreateSpaceModal';
 import { NotificationToast } from './components/NotificationToast';
 import type { ToastMessage } from './components/NotificationToast';
@@ -33,9 +35,10 @@ import { Footer } from './components/Footer';
 
 export function App() {
   // Navigation State
-  const [activeMode, setActiveMode] = useState<'explorer' | 'partner'>('explorer');
+  const [activeMode, setActiveMode] = useState<'explorer' | 'partner' | 'owner'>('explorer');
   const [activeTab, setActiveTab] = useState<'spaces' | 'meeting-rooms' | 'activities' | 'workations'>('spaces');
   const [selectedCity, setSelectedCity] = useState<string>('All');
+  const [isMyBookingsOpen, setIsMyBookingsOpen] = useState<boolean>(false);
 
   // Backend Health
   const [apiConnected, setApiConnected] = useState<boolean>(true);
@@ -176,11 +179,19 @@ export function App() {
     }
   };
 
-  const handleBookDayPass = (spaceName: string, date: string, tier: string) => {
+  const handleBookDayPass = (
+    spaceName: string,
+    date: string,
+    tier: string,
+    isPremium?: boolean,
+    premiumSeatType?: string
+  ) => {
     addToast(
       'success',
-      'Pass Reserved',
-      `${tier} pass for "${spaceName}" on ${date} confirmed. Show this pass on arrival.`
+      isPremium ? 'Premium Pass Reserved ✦' : 'Pass Reserved',
+      `${tier} pass for "${spaceName}" on ${date} confirmed${
+        isPremium ? ` with ${premiumSeatType}` : ''
+      }. Saved to Azure Table Storage.`
     );
   };
 
@@ -250,6 +261,7 @@ export function App() {
           setSelectedSpacePage(null);
         }}
         onOpenCreateSpace={() => setIsCreateSpaceOpen(true)}
+        onOpenMyBookings={() => setIsMyBookingsOpen(true)}
         apiConnected={apiConnected}
         apiStatus={apiStatus}
       />
@@ -269,6 +281,11 @@ export function App() {
             onActivityRsvp={handleActivityRsvp}
             onReserveRoom={setSelectedRoomModal}
           />
+        </main>
+      ) : activeMode === 'owner' ? (
+        /* SPACE OWNER PORTAL VIEW (Unique Username & Password per space) */
+        <main className="flex-1">
+          <SpaceOwnerPortal />
         </main>
       ) : activeMode === 'partner' ? (
         /* HOST / PARTNER PORTAL VIEW */
@@ -558,6 +575,12 @@ export function App() {
         onClose={() => setIsCreateSpaceOpen(false)}
         partners={partners}
         onSubmit={handleCreateSpace}
+      />
+
+      {/* Nomad My Bookings Modal */}
+      <MyBookingsModal
+        isOpen={isMyBookingsOpen}
+        onClose={() => setIsMyBookingsOpen(false)}
       />
 
       {/* Notifications Toast Bar */}

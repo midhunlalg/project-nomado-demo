@@ -245,3 +245,52 @@ export interface NaturalLanguageSearchResult {
   results: SearchResultItem[];
   totalMatches: number;
 }
+
+export interface Booking {
+  id: string;
+  spaceId: string;
+  spaceName: string;
+  city: string;
+  guestName: string;
+  guestEmail: string;
+  bookingDate: string;
+  tier: string;
+  isPremium: boolean;
+  premiumSeatType: string;
+  basePrice: number;
+  premiumFee: number;
+  totalPrice: number;
+  currency: string;
+  status: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface CreateBookingPayload {
+  spaceId: string;
+  spaceName?: string;
+  guestName: string;
+  guestEmail: string;
+  bookingDate: string;
+  tier: 'DAILY' | 'HOURLY' | 'MONTHLY';
+  isPremium: boolean;
+  premiumSeatType?: string;
+  notes?: string;
+}
+
+export interface SpaceOwner {
+  spaceId: string;
+  spaceName: string;
+  city: string;
+  username: string;
+  ownerName: string;
+  email: string;
+  phone: string;
+}
+
+export interface SpaceOwnerLoginResponse {
+  success: boolean;
+  message: string;
+  owner?: SpaceOwner;
+  bookings?: Booking[];
+}

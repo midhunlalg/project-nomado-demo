@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { X, Wifi, Star, MapPin, Users, Clock, Check, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, Wifi, Star, MapPin, Users, Clock, Check, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import type { CoworkingSpace } from '../types';
+import { api } from '../services/api';
 
 interface SpaceDetailModalProps {
   space: CoworkingSpace | null;
   onClose: () => void;
-  onBookPass: (spaceName: string, date: string, tier: string) => void;
+  onBookPass: (spaceName: string, date: string, tier: string, isPremium?: boolean, premiumSeatType?: string) => void;
 }
 
 export const SpaceDetailModal: React.FC<SpaceDetailModalProps> = ({
@@ -17,26 +18,70 @@ export const SpaceDetailModal: React.FC<SpaceDetailModalProps> = ({
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
+  const [isPremium, setIsPremium] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!space) return null;
 
-  const handleSubmitBooking = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onBookPass(space.name, selectedDate, selectedTier.toUpperCase());
-      onClose();
-    }, 600);
+  const getPremiumSeatView = (sp: CoworkingSpace) => {
+    const text = `${sp.name} ${sp.city} ${sp.description}`.toLowerCase();
+    if (text.includes('varkala') || text.includes('cliff') || text.includes('sea') || text.includes('ocean')) {
+      return '🌊 Sea-Facing Cliffside Window Seat';
+    }
+    if (text.includes('munnar') || text.includes('tea') || text.includes('mountain') || text.includes('cloud')) {
+      return '🍃 Tea Plantation Panoramic View Seat';
+    }
+    if (text.includes('alleppey') || text.includes('water') || text.includes('backwater')) {
+      return '🛶 Backwater Canal & Houseboat View Seat';
+    }
+    if (text.includes('wayanad') || text.includes('coffee') || text.includes('rainforest')) {
+      return '☕ Coffee Plantation Canopy View Seat';
+    }
+    if (text.includes('fort kochi') || text.includes('heritage') || text.includes('courtyard')) {
+      return '🌿 Rain-Tree Courtyard Balcony Seat';
+    }
+    if (text.includes('kakkanad') || text.includes('tech') || text.includes('infopark')) {
+      return '🏙️ Skyline Tech High-Floor View Seat';
+    }
+    return '✦ Scenic Premium View Seat';
   };
 
-  const currentPrice =
+  const premiumSeatView = getPremiumSeatView(space);
+  const basePrice =
     selectedTier === 'daily'
       ? space.pricing.dailyPrice || 450
       : selectedTier === 'hourly'
       ? space.pricing.hourlyPrice || 80
       : space.pricing.monthlyPrice || 6500;
+
+  const premiumFee = isPremium
+    ? (selectedTier === 'hourly' ? 30 : selectedTier === 'monthly' ? 1200 : 150)
+    : 0;
+
+  const totalDue = basePrice + premiumFee;
+
+  const handleSubmitBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await api.createBooking({
+        spaceId: space.id,
+        spaceName: space.name,
+        guestName,
+        guestEmail,
+        bookingDate: selectedDate,
+        tier: selectedTier.toUpperCase() as 'DAILY' | 'HOURLY' | 'MONTHLY',
+        isPremium,
+        premiumSeatType: isPremium ? premiumSeatView : undefined
+      });
+      onBookPass(space.name, selectedDate, selectedTier.toUpperCase(), isPremium, premiumSeatView);
+      onClose();
+    } catch (err) {
+      console.error('Booking failed:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
@@ -230,9 +275,38 @@ export const SpaceDetailModal: React.FC<SpaceDetailModalProps> = ({
                 </div>
               </div>
 
+              {/* Premium Seat Checkbox */}
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/90 transition-all">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isPremium}
+                    onChange={(e) => setIsPremium(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-[#1B3B36] rounded border-stone-300 focus:ring-[#1B3B36] cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm font-bold text-stone-900 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Premium Seat</span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-semibold">
+                          {premiumSeatView}
+                        </span>
+                      </span>
+                      <span className="text-xs sm:text-sm font-bold text-[#1B3B36]">
+                        +₹{selectedTier === 'hourly' ? '30' : selectedTier === 'monthly' ? '1,200' : '150'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
+                      Guaranteed premium location ({premiumSeatView}) with priority power outlet and barista service.
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-sm text-stone-600">
-                  Total: <span className="text-xl font-bold text-[#1A1918]">₹{currentPrice.toLocaleString()}</span> (Instant pass issued)
+                  Total: <span className="text-xl font-bold text-[#1A1918]">₹{totalDue.toLocaleString()}</span> {isPremium && <span className="text-xs text-amber-800 font-semibold">(Includes Premium View Seat)</span>}
                 </div>
 
                 <button

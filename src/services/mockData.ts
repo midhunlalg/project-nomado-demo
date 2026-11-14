@@ -1,4 +1,4 @@
-import type { CoworkingSpace, MeetingRoom, Activity, WorkationPackage, Partner } from '../types';
+import type { CoworkingSpace, MeetingRoom, Activity, WorkationPackage, Partner, Booking } from '../types';
 
 export const MOCK_PARTNERS: Partner[] = [
   {
@@ -373,5 +373,134 @@ export const MOCK_WORKATIONS: WorkationPackage[] = [
     availableTo: new Date(Date.now() + 100 * 86400000).toISOString(),
     isActive: true,
     createdAt: new Date().toISOString()
+  }
+];
+
+export const MOCK_SPACE_OWNER_CREDENTIALS = [
+  {
+    spaceId: 'space-varkala-cliff',
+    spaceName: 'Varkala Cliff Haven Coworking',
+    city: 'Varkala',
+    username: 'varkala_cliff',
+    password: 'Password123!',
+    ownerName: 'Rahul Menon',
+    email: 'rahul@malabarnomads.in',
+    phone: '+91 98470 12345',
+    premiumSeatView: '🌊 Sea-Facing Cliffside Window Seat'
+  },
+  {
+    spaceId: 'space-kochi-heritage',
+    spaceName: 'Fort Kochi Heritage Loft & Atelier',
+    city: 'Kochi',
+    username: 'kochi_heritage',
+    password: 'Password123!',
+    ownerName: 'Anjali Nair',
+    email: 'anjali@kochitech.in',
+    phone: '+91 94471 23456',
+    premiumSeatView: '🌿 Rain-Tree Courtyard Balcony Seat'
+  },
+  {
+    spaceId: 'space-munnar-cloud',
+    spaceName: 'Munnar Tea Hills Cloud Hub',
+    city: 'Munnar',
+    username: 'munnar_cloud',
+    password: 'Password123!',
+    ownerName: 'Thomas Mathew',
+    email: 'thomas@munnarhighlands.in',
+    phone: '+91 97452 34567',
+    premiumSeatView: '🍃 Tea Plantation Panoramic View Seat'
+  },
+  {
+    spaceId: 'space-kochi-kakkanad',
+    spaceName: 'Kakkanad Tech Sanctuary',
+    city: 'Kochi',
+    username: 'kakkanad_tech',
+    password: 'Password123!',
+    ownerName: 'Anjali Nair',
+    email: 'anjali@kochitech.in',
+    phone: '+91 94471 23456',
+    premiumSeatView: '🏙️ Skyline Tech High-Floor View Seat'
+  },
+  {
+    spaceId: 'space-wayanad-plantation',
+    spaceName: 'Wayanad Rainforest & Coffee Co-Lab',
+    city: 'Wayanad',
+    username: 'wayanad_coffee',
+    password: 'Password123!',
+    ownerName: 'Thomas Mathew',
+    email: 'thomas@munnarhighlands.in',
+    phone: '+91 97452 34567',
+    premiumSeatView: '☕ Coffee Plantation Canopy View Seat'
+  },
+  {
+    spaceId: 'space-alleppey-waterfront',
+    spaceName: 'Alleppey Backwater Work Villa',
+    city: 'Alleppey',
+    username: 'alleppey_water',
+    password: 'Password123!',
+    ownerName: 'Rahul Menon',
+    email: 'rahul@malabarnomads.in',
+    phone: '+91 98470 12345',
+    premiumSeatView: '🛶 Backwater Canal & Houseboat View Seat'
+  }
+];
+
+export const MOCK_BOOKINGS: Booking[] = [
+  {
+    id: 'BK-VARK-894102',
+    spaceId: 'space-varkala-cliff',
+    spaceName: 'Varkala Cliff Haven Coworking',
+    city: 'Varkala',
+    guestName: 'Priya Sharma',
+    guestEmail: 'priya.sharma@remote.io',
+    bookingDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    tier: 'DAILY',
+    isPremium: true,
+    premiumSeatType: '🌊 Sea-Facing Cliffside Window Seat',
+    basePrice: 450,
+    premiumFee: 150,
+    totalPrice: 600,
+    currency: 'INR',
+    status: 'Confirmed',
+    notes: 'Need quiet desk overlooking Arabian Sea surf break',
+    createdAt: new Date(Date.now() - 3600000).toISOString()
+  },
+  {
+    id: 'BK-MUNN-301982',
+    spaceId: 'space-munnar-cloud',
+    spaceName: 'Munnar Tea Hills Cloud Hub',
+    city: 'Munnar',
+    guestName: 'Arjun Varma',
+    guestEmail: 'arjun.v@techfounder.in',
+    bookingDate: new Date(Date.now() + 2 * 86400000).toISOString().split('T')[0],
+    tier: 'DAILY',
+    isPremium: true,
+    premiumSeatType: '🍃 Tea Plantation Panoramic View Seat',
+    basePrice: 390,
+    premiumFee: 120,
+    totalPrice: 510,
+    currency: 'INR',
+    status: 'Confirmed',
+    notes: 'Attending executive strategy session',
+    createdAt: new Date(Date.now() - 7200000).toISOString()
+  },
+  {
+    id: 'BK-ALLE-772154',
+    spaceId: 'space-alleppey-waterfront',
+    spaceName: 'Alleppey Backwater Work Villa',
+    city: 'Alleppey',
+    guestName: 'David Chen',
+    guestEmail: 'david.chen@nomadglobal.com',
+    bookingDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
+    tier: 'DAILY',
+    isPremium: true,
+    premiumSeatType: '🛶 Backwater Canal & Houseboat View Seat',
+    basePrice: 420,
+    premiumFee: 120,
+    totalPrice: 540,
+    currency: 'INR',
+    status: 'Confirmed',
+    notes: 'Sunset canoe after work',
+    createdAt: new Date(Date.now() - 14400000).toISOString()
   }
 ];
