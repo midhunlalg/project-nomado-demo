@@ -101,7 +101,7 @@ export const HeroSearch: React.FC<HeroSearchProps> = ({
       </form>
 
       {/* Refined Quick Suggestion Prompts */}
-      <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6 text-sm text-stone-500">
+      {/* <div className="flex flex-wrap items-center justify-center gap-2.5 mb-6 text-sm text-stone-500">
         <span className="font-semibold text-stone-700 mr-1">Popular searches:</span>
         {suggestions.map((s, idx) => (
           <button
@@ -112,7 +112,7 @@ export const HeroSearch: React.FC<HeroSearchProps> = ({
             {s.label}
           </button>
         ))}
-      </div>
+      </div> */}
 
       {/* AI Intent Breakdown Card (Clean, Sophisticated Style) */}
       {activeIntent && (
