@@ -22,7 +22,19 @@ import {
   MOCK_SPACE_OWNER_CREDENTIALS
 } from './mockData';
 
-const BASE_URL = '/api/v1';
+export const AZURE_HOSTED_URL = 'https://nomadoapi-fpe5b0cqcjhddsa8.centralindia-01.azurewebsites.net';
+
+const BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/v1`
+  : import.meta.env.PROD
+  ? `${AZURE_HOSTED_URL}/api/v1`
+  : '/api/v1';
+
+const HEALTH_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/health`
+  : import.meta.env.PROD
+  ? `${AZURE_HOSTED_URL}/health`
+  : '/health';
 
 // Helper to determine if we should fall back to local mock data
 async function handleResponse<T>(res: Response, fallbackData: T): Promise<T> {
@@ -40,16 +52,16 @@ async function handleResponse<T>(res: Response, fallbackData: T): Promise<T> {
 
 export const api = {
   // Health check
-  async checkHealth(): Promise<{ status: string; connected: boolean }> {
+  async checkHealth(): Promise<{ status: string; connected: boolean; url?: string }> {
     try {
-      const res = await fetch('/health', { signal: AbortSignal.timeout(3000) });
+      const res = await fetch(HEALTH_URL, { signal: AbortSignal.timeout(4000) });
       if (res.ok) {
         const data = await res.json();
-        return { status: data.status || 'Healthy', connected: true };
+        return { status: data.status || 'Healthy (Azure Cloud)', connected: true, url: AZURE_HOSTED_URL };
       }
-      return { status: 'Degraded', connected: false };
+      return { status: 'Degraded', connected: false, url: AZURE_HOSTED_URL };
     } catch {
-      return { status: 'Offline (Using Mock Cache)', connected: false };
+      return { status: 'Offline (Using Mock Cache)', connected: false, url: AZURE_HOSTED_URL };
     }
   },
 

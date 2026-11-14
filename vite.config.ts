@@ -12,12 +12,12 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5135',
+        target: 'https://nomadoapi-fpe5b0cqcjhddsa8.centralindia-01.azurewebsites.net',
         changeOrigin: true,
         secure: false,
       },
       '/health': {
-        target: 'http://localhost:5135',
+        target: 'https://nomadoapi-fpe5b0cqcjhddsa8.centralindia-01.azurewebsites.net',
         changeOrigin: true,
         secure: false,
       }

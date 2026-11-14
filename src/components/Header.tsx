@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <PulseIcon className={`w-4 h-4 ${apiConnected ? 'text-[#16a34a]' : 'text-[#ca8a04]'}`} />
             <span>
-              {apiConnected ? 'Connected (5135)' : 'Cached'}
+              {apiConnected ? 'Azure Cloud Live' : 'Cached'}
             </span>
           </div>
 
