@@ -154,8 +154,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: `${space.name} - Nomado Kerala`,
-        text: `Check out ${space.name} in ${space.city}, Kerala on Project Nomado.`,
+        title: `${space.name} - deskIndo Kerala`,
+        text: `Check out ${space.name} in ${space.city}, Kerala on deskIndo.`,
         url: window.location.href
       }).catch(() => {});
     } else {
@@ -459,7 +459,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EBF0ED] text-[#1B3B36] text-xs font-semibold mb-2">
                     <Sparkles className="w-3.5 h-3.5 text-[#1B3B36]" />
-                    <span>Section 1 • Nomado Community</span>
+                    <span>Section 1 • deskIndo Community</span>
                   </div>
                   <h2 className="font-editorial text-2xl sm:text-3xl font-normal text-[#1A1918]">
                     Experiences & Activities Nearby
@@ -555,7 +555,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                     No scheduled meetups in {space.city} today
                   </h4>
                   <p className="text-xs sm:text-sm text-stone-500 mt-1 max-w-md mx-auto">
-                    Nomado residents host informal chai chats and sunset sessions daily. Drop into the workspace lounge to connect!
+                    deskIndo residents host informal chai chats and sunset sessions daily. Drop into the workspace lounge to connect!
                   </p>
                 </div>
               )}
@@ -564,7 +564,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               <div className="mt-6 p-4 rounded-2xl bg-[#EBF0ED]/70 border border-[#1B3B36]/15 flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#1B3B36] shrink-0 mt-0.5" />
                 <div className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                  <span className="font-semibold text-[#1B3B36]">Nomado Resident Access:</span> All day pass holders and residents get free priority access to community mixers, founder circles, and weekend excursions.
+                  <span className="font-semibold text-[#1B3B36]">deskIndo Resident Access:</span> All day pass holders and residents get free priority access to community mixers, founder circles, and weekend excursions.
                 </div>
               </div>
             </section>

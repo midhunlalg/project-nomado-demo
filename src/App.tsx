@@ -218,7 +218,7 @@ export function App() {
       addToast(
         'success',
         'Workspace Listed',
-        `"${newSpace.name}" in ${newSpace.city}, Kerala is now live on Nomado.`
+        `"${newSpace.name}" in ${newSpace.city}, Kerala is now live on deskIndo.`
       );
     } catch {
       addToast('error', 'Error Listing Space', 'Could not save space to the API.');

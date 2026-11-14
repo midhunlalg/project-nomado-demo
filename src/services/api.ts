@@ -39,13 +39,13 @@ const HEALTH_URL = import.meta.env.VITE_API_URL
 // Helper to determine if we should fall back to local mock data
 async function handleResponse<T>(res: Response, fallbackData: T): Promise<T> {
   if (!res.ok) {
-    console.warn(`[Nomado API] Server returned ${res.status}: ${res.statusText}. Using fallback data.`);
+    console.warn(`[deskIndo API] Server returned ${res.status}: ${res.statusText}. Using fallback data.`);
     return fallbackData;
   }
   try {
     return await res.json();
   } catch (err) {
-    console.warn('[Nomado API] JSON parse error:', err);
+    console.warn('[deskIndo API] JSON parse error:', err);
     return fallbackData;
   }
 }

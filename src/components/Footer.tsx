@@ -6,16 +6,18 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 mb-14">
         {/* Brand & Mission */}
         <div className="md:col-span-2 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#1B3B36] flex items-center justify-center text-white text-sm font-bold">
-              ✦
-            </div>
-            <span className="font-editorial text-3xl font-normal text-[#1A1918]">
-              Nomado
+          <div className="flex items-center gap-4">
+            <img 
+              src="/deskindo-logo.png" 
+              alt="deskIndo" 
+              className="h-20 sm:h-24 w-auto object-contain rounded-lg"
+            />
+            {/* <span className="font-editorial text-3xl font-normal text-[#1A1918]">
+              deskIndo
             </span>
             <span className="text-xs uppercase tracking-wider text-stone-500 font-semibold">
               Kerala Network
-            </span>
+            </span> */}
           </div>
 
           <p className="text-base font-normal text-stone-600 max-w-md leading-relaxed">
@@ -40,9 +42,9 @@ export const Footer: React.FC = () => {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-stone-500">
         <div>
-          Nomado Kerala • Digital Nomad & Workation Discovery Platform.
+          deskIndo Kerala • Digital Nomad & Workation Discovery Platform.
         </div>
-        <div>
+        {/* <div>
           <a
             href="http://localhost:5135/swagger"
             target="_blank"
@@ -52,7 +54,7 @@ export const Footer: React.FC = () => {
             <span>Swagger API Documentation</span>
             <ArrowUpRight className="w-4 h-4" />
           </a>
-        </div>
+        </div> */}
       </div>
     </footer>
   );
