@@ -19,7 +19,7 @@ interface DestinationOption {
 }
 
 const DESTINATION_OPTIONS: DestinationOption[] = [
-  { value: 'All', label: 'All Spaces', tagline: 'All Kerala Spaces' },
+  { value: 'All', label: 'Locations', tagline: 'All Kerala Spaces' },
   { value: 'Varkala', label: 'Varkala', tagline: 'Cliffs & Arabian Sea' },
   { value: 'Kochi', label: 'Kochi', tagline: 'Fort Kochi & Infopark' },
   { value: 'Munnar', label: 'Munnar', tagline: 'Tea Hills & Mountain Mist' },
@@ -100,33 +100,34 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Navigation Menu Tabs (Equal Horizontal Spacing & Matching Padding) */}
         <nav className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-          {/* 1. All Spaces Dropdown */}
+          {/* 1. Explore & Location DDL (Clubbed Single Tab) */}
           <div ref={dropdownRef} className="relative z-30">
             <button
               type="button"
-              onClick={() => setIsDropdownOpen(prev => !prev)}
+              onClick={() => {
+                if (activeMode !== 'explorer') {
+                  onToggleMode('explorer');
+                }
+                setIsDropdownOpen(prev => !prev);
+              }}
               aria-expanded={isDropdownOpen}
               aria-haspopup="listbox"
               className={`group flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full border text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer shadow-2xs select-none ${
-                isDropdownOpen
-                  ? 'bg-white border-[#1B3B36] ring-2 ring-[#1B3B36]/15 text-[#1B3B36]'
-                  : selectedCity !== 'All'
-                  ? 'bg-[#EBF0ED] border-[#1B3B36]/30 text-[#1B3B36] hover:bg-[#E2EBE5]'
-                  : 'bg-[#F2EFE9] border-[#E7E5DF] text-stone-800 hover:bg-[#EAE6DF] hover:border-stone-300'
+                activeMode === 'explorer'
+                  ? 'bg-[#1B3B36] border-[#1B3B36] text-white shadow-xs'
+                  : 'bg-[#F2EFE9] border-[#E7E5DF] text-stone-700 hover:bg-[#EAE6DF] hover:text-stone-900 hover:border-stone-300'
               }`}
             >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#16a34a] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16a34a]" />
-              </span>
-              <MapPin className="w-4 h-4 text-[#1B3B36] shrink-0" />
-              <span className="tracking-tight text-[#1A1918]">
+              <Sparkles className={`w-4 h-4 shrink-0 ${activeMode === 'explorer' ? 'text-white' : 'text-[#1B3B36]'}`} />
+              <span>Explore</span>
+              <span className={activeMode === 'explorer' ? 'text-white/40' : 'text-stone-300'}>·</span>
+              <span className={`tracking-tight font-medium ${activeMode === 'explorer' ? 'text-white/90' : 'text-stone-600'}`}>
                 {currentLabel}
               </span>
               <ChevronDown
-                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-stone-500 transition-transform duration-200 shrink-0 ${
-                  isDropdownOpen ? 'rotate-180 text-[#1B3B36]' : 'group-hover:text-stone-800'
-                }`}
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-200 shrink-0 ${
+                  activeMode === 'explorer' ? 'text-white/80' : 'text-stone-500 group-hover:text-stone-800'
+                } ${isDropdownOpen ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -137,9 +138,12 @@ export const Header: React.FC<HeaderProps> = ({
                 className="absolute top-full left-0 mt-2 w-64 sm:w-72 bg-white rounded-2xl border border-[#E7E5DF] shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150 origin-top-left"
               >
                 <div className="px-3 py-2 border-b border-[#F2EFE9] mb-1 flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                    Kerala Destinations
-                  </span>
+                  <div className="flex items-center gap-1.5 text-stone-500">
+                    <MapPin className="w-3.5 h-3.5 text-[#1B3B36]" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                      Kerala Destinations
+                    </span>
+                  </div>
                   <span className="text-[10px] font-medium text-stone-400">
                     {DESTINATION_OPTIONS.length} Locations
                   </span>
@@ -155,6 +159,9 @@ export const Header: React.FC<HeaderProps> = ({
                         aria-selected={isSelected}
                         onClick={() => {
                           onSelectCity(opt.value);
+                          if (activeMode !== 'explorer') {
+                            onToggleMode('explorer');
+                          }
                           setIsDropdownOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all duration-150 cursor-pointer ${
@@ -182,20 +189,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* 2. Explore Tab */}
-          <button
-            onClick={() => onToggleMode('explorer')}
-            className={`flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shadow-2xs border ${
-              activeMode === 'explorer'
-                ? 'bg-[#1B3B36] border-[#1B3B36] text-white shadow-xs'
-                : 'bg-[#F2EFE9] border-[#E7E5DF] text-stone-700 hover:bg-[#EAE6DF] hover:text-stone-900 hover:border-stone-300'
-            }`}
-          >
-            <Sparkles className={`w-4 h-4 ${activeMode === 'explorer' ? 'text-white' : 'text-[#1B3B36]'}`} />
-            <span>Explore</span>
-          </button>
-
-          {/* 3. Space Owners Tab */}
+          {/* 2. Space Owners Tab */}
           <button
             onClick={() => onToggleMode('owner')}
             className={`flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shadow-2xs border ${
@@ -208,7 +202,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Space Owners</span>
           </button>
 
-          {/* 4. Hosts Tab */}
+          {/* 3. Hosts Tab */}
           <button
             onClick={() => onToggleMode('partner')}
             className={`flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shadow-2xs border ${
@@ -221,7 +215,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span>Hosts</span>
           </button>
 
-          {/* 5. My Bookings Tab */}
+          {/* 4. My Bookings Tab */}
           <button
             onClick={onOpenMyBookings}
             className="flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shadow-2xs border bg-white border-[#D6D3CB] text-stone-800 hover:bg-[#F6F4EE] hover:border-[#BCB8AD]"
@@ -231,7 +225,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span>My Bookings</span>
           </button>
 
-          {/* 6. List Space Tab */}
+          {/* 5. List Space Tab */}
           <button
             onClick={onOpenCreateSpace}
             className="flex items-center gap-2 px-4 py-2 sm:px-4.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shadow-xs bg-[#1B3B36] border border-[#1B3B36] text-white hover:bg-[#132B27] hover:border-[#132B27]"
