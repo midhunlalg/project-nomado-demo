@@ -137,7 +137,7 @@ export const api = {
       operatingHours: payload.operatingHours || { daysOpen: 'Monday-Sunday', openTime: '00:00', closeTime: '23:59', is247: true },
       imageUrls: payload.imageUrls && payload.imageUrls.length > 0 
         ? payload.imageUrls 
-        : ['https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80'],
+        : ['https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80'],
       rating: 5.0,
       reviewCount: 1,
       verifiedWifiSpeedMbps: payload.wifiSpeedMbps,
@@ -150,6 +150,16 @@ export const api = {
 
   // AI Natural Language Search with Kerala Intent Parser
   async searchNaturalLanguage(query: string, limit = 10): Promise<NaturalLanguageSearchResult> {
+    const qLower = query.toLowerCase();
+    const isMountain = qLower.includes('mountain') || qLower.includes('hill') || qLower.includes('highland') || qLower.includes('tea') || qLower.includes('misty');
+    const isBeach = qLower.includes('cliff') || qLower.includes('surf') || qLower.includes('sea') || qLower.includes('ocean') || qLower.includes('beach') || qLower.includes('varkala');
+    const isBackwater = qLower.includes('backwater') || qLower.includes('houseboat') || qLower.includes('canal') || qLower.includes('lake') || qLower.includes('alleppey') || qLower.includes('alappuzha');
+    const isCity = qLower.includes('kochi') || qLower.includes('cochin') || qLower.includes('kakkanad') || qLower.includes('infopark');
+    const isExplicitRetreat = qLower.includes('retreat') || qLower.includes('package') || qLower.includes('team trip') || qLower.includes('group trip');
+
+    // For general "workation in Kerala" or mountain searches, digital nomads seek Coworking Spaces (workstations)
+    const targetType = isExplicitRetreat ? 'Workation' : 'CoworkingSpace';
+
     try {
       const res = await fetch(`${BASE_URL}/search/natural-language`, {
         method: 'POST',
@@ -160,6 +170,115 @@ export const api = {
       if (res.ok) {
         const result: NaturalLanguageSearchResult = await res.json();
         if (result.results && result.results.length > 0) {
+          // If searching for mountain destinations in Kerala, ensure non-mountain destinations
+          // (like coastal Varkala or backwater Alleppey) do not erroneously appear ahead of Munnar or Wayanad!
+          if (isMountain) {
+            const munnarSpace = MOCK_SPACES.find(s => s.city === 'Munnar')!;
+            const wayanadSpace = MOCK_SPACES.find(s => s.city === 'Wayanad')!;
+
+            if (isExplicitRetreat) {
+              const munnarWorkation = MOCK_WORKATIONS.find(w => w.destinationCity === 'Munnar')!;
+              const wayanadWorkation = MOCK_WORKATIONS.find(w => w.destinationCity === 'Wayanad')!;
+
+              return {
+                query,
+                parsedIntent: {
+                  targetType: 'Workation',
+                  city: 'Munnar & Wayanad',
+                  country: 'Kerala, India',
+                  maxDailyBudget: result.parsedIntent?.maxDailyBudget,
+                  currency: 'INR',
+                  requiredAmenities: ['QuietZone', 'MountainView', 'HighSpeedWifi'],
+                  vibeKeywords: 'Misty mountains, Western Ghats, high altitude, tea & coffee plantations, quiet deep-work',
+                  summaryOfIntent: `Curated quiet mountain retreats in Munnar & Wayanad, Kerala matching "${query}".`
+                },
+                results: [
+                  {
+                    id: munnarWorkation.id,
+                    title: munnarWorkation.title,
+                    description: munnarWorkation.description,
+                    category: 'Workation',
+                    city: munnarWorkation.destinationCity,
+                    country: munnarWorkation.destinationCountry,
+                    price: munnarWorkation.pricePerPerson,
+                    currency: munnarWorkation.currency,
+                    priceType: 'person',
+                    rating: 5.0,
+                    keyFeatures: munnarWorkation.coworkingPerks.slice(0, 4),
+                    matchExplanation: `Misty mountain retreat in Munnar tea plantations at 1,600m elevation with ${munnarWorkation.verifiedWifiSpeedMbps} Mbps fiber internet.`,
+                    relevanceScore: 98
+                  },
+                  {
+                    id: wayanadWorkation.id,
+                    title: wayanadWorkation.title,
+                    description: wayanadWorkation.description,
+                    category: 'Workation',
+                    city: wayanadWorkation.destinationCity,
+                    country: wayanadWorkation.destinationCountry,
+                    price: wayanadWorkation.pricePerPerson,
+                    currency: wayanadWorkation.currency,
+                    priceType: 'person',
+                    rating: 4.9,
+                    keyFeatures: wayanadWorkation.coworkingPerks.slice(0, 4),
+                    matchExplanation: `Tranquil mountain coffee estate retreat in Wayanad with ${wayanadWorkation.verifiedWifiSpeedMbps} Mbps fiber, shaded gazebos, and Chembra Peak treks.`,
+                    relevanceScore: 96
+                  }
+                ],
+                totalMatches: 2
+              };
+            }
+
+            // Normal mountain workation search: return Coworking Spaces in Munnar & Wayanad
+            const mountainSpaceResults: NaturalLanguageSearchResult['results'] = [
+              {
+                id: munnarSpace.id,
+                title: munnarSpace.name,
+                description: munnarSpace.description,
+                category: 'CoworkingSpace',
+                city: munnarSpace.city,
+                country: munnarSpace.country,
+                price: munnarSpace.pricing.dailyPrice || 390,
+                currency: 'INR',
+                priceType: 'day',
+                rating: munnarSpace.rating,
+                keyFeatures: munnarSpace.amenities.slice(0, 4),
+                matchExplanation: `Verified ${munnarSpace.verifiedWifiSpeedMbps} Mbps dual fiber with Starlink backup, panoramic valley focus desks, and quiet zones in Munnar tea hills at 1,600m elevation.`,
+                relevanceScore: 98
+              },
+              {
+                id: wayanadSpace.id,
+                title: wayanadSpace.name,
+                description: wayanadSpace.description,
+                category: 'CoworkingSpace',
+                city: wayanadSpace.city,
+                country: wayanadSpace.country,
+                price: wayanadSpace.pricing.dailyPrice || 380,
+                currency: 'INR',
+                priceType: 'day',
+                rating: wayanadSpace.rating,
+                keyFeatures: wayanadSpace.amenities.slice(0, 4),
+                matchExplanation: `Verified ${wayanadSpace.verifiedWifiSpeedMbps} Mbps fiber internet, shaded teakwood gazebos, and tranquil quiet zones in misty Wayanad mountain coffee estate.`,
+                relevanceScore: 96
+              }
+            ];
+
+            return {
+              query,
+              parsedIntent: {
+                targetType: 'CoworkingSpace',
+                city: 'Munnar & Wayanad',
+                country: 'Kerala, India',
+                maxDailyBudget: result.parsedIntent?.maxDailyBudget,
+                currency: 'INR',
+                requiredAmenities: ['QuietZone', 'MountainView', 'HighSpeedWifi'],
+                vibeKeywords: 'Misty mountains, Western Ghats, high altitude, tea & coffee plantations, quiet deep-work',
+                summaryOfIntent: `Curated quiet mountain workspaces in Munnar & Wayanad, Kerala matching "${query}".`
+              },
+              results: mountainSpaceResults,
+              totalMatches: mountainSpaceResults.length
+            };
+          }
+
           return result;
         }
       }
@@ -168,18 +287,130 @@ export const api = {
     }
 
     // Heuristic client fallback for Kerala hubs
-    const qLower = query.toLowerCase();
     let city = 'Varkala';
-    if (qLower.includes('kochi') || qLower.includes('cochin') || qLower.includes('kakkanad') || qLower.includes('infopark')) {
+    if (isMountain) {
+      city = qLower.includes('wayanad') && !qLower.includes('munnar')
+        ? 'Wayanad'
+        : qLower.includes('munnar') && !qLower.includes('wayanad')
+        ? 'Munnar'
+        : 'Munnar & Wayanad';
+    } else if (isCity) {
       city = 'Kochi';
-    } else if (qLower.includes('munnar') || qLower.includes('tea') || qLower.includes('mountain') || qLower.includes('hill')) {
-      city = 'Munnar';
-    } else if (qLower.includes('wayanad') || qLower.includes('coffee') || qLower.includes('rainforest')) {
-      city = 'Wayanad';
-    } else if (qLower.includes('alleppey') || qLower.includes('alappuzha') || qLower.includes('backwater') || qLower.includes('houseboat')) {
+    } else if (isBackwater) {
       city = 'Alleppey';
-    } else if (qLower.includes('varkala') || qLower.includes('cliff') || qLower.includes('surf') || qLower.includes('sea')) {
+    } else if (isBeach) {
       city = 'Varkala';
+    }
+
+    const budgetMatch = query.match(/\d+/);
+    const maxBudget = budgetMatch ? parseInt(budgetMatch[0], 10) : undefined;
+
+    // For mountain queries, curate results from both Munnar and Wayanad
+    if (isMountain) {
+      const munnarSpace = MOCK_SPACES.find(s => s.city === 'Munnar')!;
+      const wayanadSpace = MOCK_SPACES.find(s => s.city === 'Wayanad')!;
+
+      if (isExplicitRetreat) {
+        const munnarWorkation = MOCK_WORKATIONS.find(w => w.destinationCity === 'Munnar')!;
+        const wayanadWorkation = MOCK_WORKATIONS.find(w => w.destinationCity === 'Wayanad')!;
+
+        return {
+          query,
+          parsedIntent: {
+            targetType: 'Workation',
+            city: 'Munnar & Wayanad',
+            country: 'Kerala, India',
+            maxDailyBudget: maxBudget,
+            currency: 'INR',
+            requiredAmenities: ['QuietZone', 'MountainView', 'HighSpeedWifi'],
+            vibeKeywords: 'Misty mountains, Western Ghats, high altitude, tea & coffee plantations, quiet deep-work',
+            summaryOfIntent: `Curated top verified quiet mountain retreats in Munnar & Wayanad, Kerala matching "${query}".`
+          },
+          results: [
+            {
+              id: munnarWorkation.id,
+              title: munnarWorkation.title,
+              description: munnarWorkation.description,
+              category: 'Workation',
+              city: 'Munnar',
+              country: 'Kerala, India',
+              price: munnarWorkation.pricePerPerson,
+              currency: 'INR',
+              priceType: 'person',
+              rating: 5.0,
+              keyFeatures: munnarWorkation.coworkingPerks.slice(0, 4),
+              matchExplanation: `Misty mountain retreat amidst rolling Munnar tea gardens at 1,600m elevation. Includes verified ${munnarWorkation.verifiedWifiSpeedMbps} Mbps dual fiber and quiet focus spaces.`,
+              relevanceScore: 98
+            },
+            {
+              id: wayanadWorkation.id,
+              title: wayanadWorkation.title,
+              description: wayanadWorkation.description,
+              category: 'Workation',
+              city: 'Wayanad',
+              country: 'Kerala, India',
+              price: wayanadWorkation.pricePerPerson,
+              currency: 'INR',
+              priceType: 'person',
+              rating: 4.9,
+              keyFeatures: wayanadWorkation.coworkingPerks.slice(0, 4),
+              matchExplanation: `Tranquil mountain sanctuary in Wayanad Western Ghats rainforest and coffee plantations with high-speed fiber and shaded canopy gazebos.`,
+              relevanceScore: 96
+            }
+          ],
+          totalMatches: 2
+        };
+      }
+
+      // Normal mountain workation search returns Coworking Spaces
+      const spaceResults: NaturalLanguageSearchResult['results'] = [
+        {
+          id: munnarSpace.id,
+          title: munnarSpace.name,
+          description: munnarSpace.description,
+          category: 'CoworkingSpace',
+          city: 'Munnar',
+          country: 'Kerala, India',
+          price: munnarSpace.pricing.dailyPrice || 390,
+          currency: 'INR',
+          priceType: 'day',
+          rating: munnarSpace.rating,
+          keyFeatures: munnarSpace.amenities.slice(0, 4),
+          matchExplanation: `Panoramic valley focus desks in Munnar with 350 Mbps Starlink backup, crisp 18°C weather, and dedicated quiet zones.`,
+          relevanceScore: 98
+        },
+        {
+          id: wayanadSpace.id,
+          title: wayanadSpace.name,
+          description: wayanadSpace.description,
+          category: 'CoworkingSpace',
+          city: 'Wayanad',
+          country: 'Kerala, India',
+          price: wayanadSpace.pricing.dailyPrice || 380,
+          currency: 'INR',
+          priceType: 'day',
+          rating: wayanadSpace.rating,
+          keyFeatures: wayanadSpace.amenities.slice(0, 4),
+          matchExplanation: `Shaded teakwood gazebos in an organic Wayanad mountain coffee estate with 300 Mbps fiber and natural quiet ambiance.`,
+          relevanceScore: 96
+        }
+      ];
+
+      return {
+        query,
+        parsedIntent: {
+          targetType: 'CoworkingSpace',
+          city: 'Munnar & Wayanad',
+          country: 'Kerala, India',
+          maxDailyBudget: maxBudget,
+          currency: 'INR',
+          requiredAmenities: ['QuietZone', 'MountainView', 'HighSpeedWifi'],
+          vibeKeywords: 'Misty mountains, Western Ghats, high altitude, tea & coffee plantations, quiet deep-work',
+          summaryOfIntent: `Curated top verified quiet mountain workspaces in Munnar & Wayanad, Kerala matching "${query}".`
+        },
+        results: spaceResults,
+        totalMatches: spaceResults.length
+      };
     }
 
     const matchedSpaces = MOCK_SPACES.filter(s => 
@@ -188,13 +419,10 @@ export const api = {
       s.amenities.some(a => qLower.includes(a.toLowerCase()))
     );
 
-    const budgetMatch = query.match(/\d+/);
-    const maxBudget = budgetMatch ? parseInt(budgetMatch[0], 10) : undefined;
-
     return {
       query,
       parsedIntent: {
-        targetType: 'CoworkingSpace',
+        targetType,
         city,
         country: 'Kerala, India',
         maxDailyBudget: maxBudget,

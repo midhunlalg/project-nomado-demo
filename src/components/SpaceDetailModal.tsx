@@ -92,7 +92,7 @@ export const SpaceDetailModal: React.FC<SpaceDetailModalProps> = ({
         {/* Banner */}
         <div className="relative h-64 sm:h-80 w-full bg-stone-100 overflow-hidden">
           <img
-            src={space.imageUrls[0] || 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80'}
+            src={space.imageUrls[0] || 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80'}
             alt={space.name}
             className="w-full h-full object-cover"
           />

@@ -54,8 +54,8 @@ export const MOCK_SPACES: CoworkingSpace[] = [
     pricing: { hourlyPrice: 80, dailyPrice: 450, monthlyPrice: 6500, currency: 'INR' },
     operatingHours: { daysOpen: 'Monday-Sunday', openTime: '00:00', closeTime: '23:59', is247: true },
     imageUrls: [
-      'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1507207611509-ec012433ff52?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80'
     ],
     rating: 4.9,
     reviewCount: 184,
@@ -77,8 +77,8 @@ export const MOCK_SPACES: CoworkingSpace[] = [
     pricing: { hourlyPrice: 90, dailyPrice: 490, monthlyPrice: 7200, currency: 'INR' },
     operatingHours: { daysOpen: 'Monday-Sunday', openTime: '07:30', closeTime: '23:00', is247: false },
     imageUrls: [
-      'https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=1200&q=80'
     ],
     rating: 4.8,
     reviewCount: 126,
@@ -100,8 +100,8 @@ export const MOCK_SPACES: CoworkingSpace[] = [
     pricing: { hourlyPrice: 75, dailyPrice: 390, monthlyPrice: 5800, currency: 'INR' },
     operatingHours: { daysOpen: 'Monday-Sunday', openTime: '06:00', closeTime: '23:00', is247: false },
     imageUrls: [
-      'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80'
     ],
     rating: 4.9,
     reviewCount: 95,
@@ -146,7 +146,8 @@ export const MOCK_SPACES: CoworkingSpace[] = [
     pricing: { hourlyPrice: 70, dailyPrice: 380, monthlyPrice: 5500, currency: 'INR' },
     operatingHours: { daysOpen: 'Monday-Sunday', openTime: '07:00', closeTime: '21:00', is247: false },
     imageUrls: [
-      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1200&q=80'
     ],
     rating: 4.8,
     reviewCount: 78,
@@ -168,7 +169,8 @@ export const MOCK_SPACES: CoworkingSpace[] = [
     pricing: { hourlyPrice: 85, dailyPrice: 420, monthlyPrice: 6200, currency: 'INR' },
     operatingHours: { daysOpen: 'Monday-Sunday', openTime: '08:00', closeTime: '22:00', is247: false },
     imageUrls: [
-      'https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=1200&q=80'
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80'
     ],
     rating: 4.9,
     reviewCount: 92,

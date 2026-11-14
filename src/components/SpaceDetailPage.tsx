@@ -168,8 +168,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   const images = space.imageUrls && space.imageUrls.length > 0
     ? space.imageUrls
     : [
-        'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80',
-        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80'
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=1200&q=80'
       ];
 
   const lat = space.location.latitude;

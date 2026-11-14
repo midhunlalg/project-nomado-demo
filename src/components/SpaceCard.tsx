@@ -17,7 +17,7 @@ export const SpaceCard: React.FC<SpaceCardProps> = ({
   const primaryImage =
     space.imageUrls && space.imageUrls.length > 0
       ? space.imageUrls[0]
-      : 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80';
+      : 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
 
   const formatPrice = (price?: number) => {
     return price ? `₹${price.toLocaleString()}` : '₹450';
@@ -36,7 +36,7 @@ export const SpaceCard: React.FC<SpaceCardProps> = ({
           className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
           onError={(e) => {
             (e.target as HTMLImageElement).src =
-              'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=800&q=80';
+              'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80';
           }}
         />
 
