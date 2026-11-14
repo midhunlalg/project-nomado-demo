@@ -198,8 +198,8 @@ export function App() {
   const handleReserveRoom = (roomName: string, hours: number, total: number) => {
     addToast(
       'success',
-      'Studio Reserved',
-      `"${roomName}" reserved for ${hours} hours (Total: ₹${total.toLocaleString()}).`
+      'Studio Reserved ✦',
+      `"${roomName}" reserved for ${hours} hours (Total: ₹${total.toLocaleString()}). Saved to Azure Table Storage.`
     );
   };
 

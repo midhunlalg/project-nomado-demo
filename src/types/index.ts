@@ -272,10 +272,12 @@ export interface CreateBookingPayload {
   guestName: string;
   guestEmail: string;
   bookingDate: string;
-  tier: 'DAILY' | 'HOURLY' | 'MONTHLY';
+  tier: 'DAILY' | 'HOURLY' | 'MONTHLY' | 'STUDIO' | string;
   isPremium: boolean;
   premiumSeatType?: string;
   notes?: string;
+  basePrice?: number;
+  totalPrice?: number;
 }
 
 export interface SpaceOwner {

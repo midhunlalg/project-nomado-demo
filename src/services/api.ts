@@ -391,8 +391,8 @@ export const api = {
     const space = MOCK_SPACES.find(s => s.id === payload.spaceId);
     const spaceName = payload.spaceName || space?.name || 'Kerala Workspace';
     const city = space?.city || 'Kerala';
-    const basePrice = payload.tier === 'HOURLY' ? 80 : payload.tier === 'MONTHLY' ? 6500 : 450;
-    const premiumFee = payload.isPremium ? (payload.tier === 'HOURLY' ? 30 : payload.tier === 'MONTHLY' ? 1200 : 150) : 0;
+    const basePrice = payload.basePrice ?? (payload.tier === 'HOURLY' ? 80 : payload.tier === 'MONTHLY' ? 6500 : 450);
+    const premiumFee = payload.isPremium ? (payload.tier === 'HOURLY' ? 30 : payload.tier === 'MONTHLY' ? 1200 : payload.tier === 'STUDIO' ? 200 : 150) : 0;
     const bookingId = `BK-${city.substring(0, 4).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const newBooking: Booking = {
@@ -408,7 +408,7 @@ export const api = {
       premiumSeatType: payload.isPremium ? (payload.premiumSeatType || 'Scenic Premium View Seat') : '',
       basePrice,
       premiumFee,
-      totalPrice: basePrice + premiumFee,
+      totalPrice: payload.totalPrice ?? (basePrice + premiumFee),
       currency: 'INR',
       status: 'Confirmed',
       notes: payload.notes || '',
