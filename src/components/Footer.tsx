@@ -32,47 +32,10 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Platform Endpoints */}
-        <div>
-          <h4 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-500 mb-3.5 flex items-center gap-1.5">
-            <Terminal className="w-4 h-4" />
-            <span>Platform API</span>
-          </h4>
-          <ul className="space-y-2 text-xs sm:text-sm font-mono text-stone-600">
-            <li className="hover:text-[#1B3B36] transition-colors">
-              GET /api/v1/spaces
-            </li>
-            <li className="hover:text-[#1B3B36] transition-colors">
-              POST /api/v1/search/natural-language
-            </li>
-            <li className="hover:text-[#1B3B36] transition-colors">
-              GET /api/v1/meeting-rooms
-            </li>
-            <li className="hover:text-[#1B3B36] transition-colors">
-              POST /api/v1/activities/register
-            </li>
-            <li className="hover:text-[#1B3B36] transition-colors">
-              GET /api/v1/workations
-            </li>
-            <li className="hover:text-[#1B3B36] transition-colors">
-              GET /api/v1/partners
-            </li>
-          </ul>
-        </div>
+        
 
         {/* Stack & Architecture */}
-        <div>
-          <h4 className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-stone-500 mb-3.5 flex items-center gap-1.5">
-            <Shield className="w-4 h-4" />
-            <span>Architecture</span>
-          </h4>
-          <div className="space-y-2 text-xs sm:text-sm text-stone-600">
-            <div>ASP.NET Core Web API (.NET 10)</div>
-            <div>Azure Table Storage SDK</div>
-            <div>React 19 + TypeScript + Vite 8</div>
-            <div>Tailwind CSS (Outsite Aesthetic)</div>
-            <div>AI Intent Natural Language Engine</div>
-          </div>
-        </div>
+       
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-sm text-stone-500">
